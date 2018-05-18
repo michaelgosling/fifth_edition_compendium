@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'dart:core';
+import 'dart:convert';
+
+// api: http://www.dnd5eapi.co/api/
+
+final List<Widget> homeList = [
+  new ListTile(title: new Text("Select a category from the drawer to get started."))
+];
 
 final List<Widget> armorList = [new ListTile(title: new Text("Test")),
                    new Divider(),
@@ -10,14 +16,20 @@ final List<Widget> armorList = [new ListTile(title: new Text("Test")),
                    new Divider(),
                    new ListTile(title: new Text("Test"))];
 
-var currentList = 0;
+List<Widget> currentList = [];
+String currentTitle = "";
 
 final List<Widget> drawerContent = [
   new Container(child: new Column(
     children: <Widget>[
       new ListTile(
         title: new Text("Armor"),
-        onTap: () {},
+        onTap: () {
+//          setState(() {
+//            currentTitle = "Armor";
+//            currentList = armorList;
+//          });
+        },
       ),
       new ListTile(
         title: new Text("Weapons"),
@@ -36,26 +48,21 @@ final List<Widget> drawerContent = [
   ),)
 ];
 
-List<Widget> itemListGeneration(newItems){
-  List<Widget> items = [];
-  for (final item in newItems)
-    items.add(item);
-  return items;
-}
-
 class CompendiumApp extends StatefulWidget {
+
   @override
   _HomePageState createState() => new _HomePageState();
 }
 
 class _HomePageState extends State<CompendiumApp> {
+
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-        title: "5e Compendium",
+        title: currentTitle,
         home: Scaffold(
             appBar: new AppBar(
-              title: new Text("5e Compendium"),
+              title: new Text(currentTitle),
             ),
             drawer: new Drawer(
               child: new ListView(
@@ -63,11 +70,15 @@ class _HomePageState extends State<CompendiumApp> {
               ),
             ),
             body: new ListView(
-              children: itemListGeneration(armorList),
+              children: currentList,
             )
         )
     );
   }
 }
 
-void main() => runApp(new CompendiumApp());
+void main() {
+  currentTitle = "5e compendium";
+  currentList = homeList;
+  runApp(new CompendiumApp());
+}
