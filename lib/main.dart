@@ -1,84 +1,96 @@
 import 'package:flutter/material.dart';
-import 'dart:core';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'dart:async';
 
 // api: http://www.dnd5eapi.co/api/
 
-final List<Widget> homeList = [
-  new ListTile(title: new Text("Select a category from the drawer to get started."))
-];
+//TODO: Add navigation drawer
 
-final List<Widget> armorList = [new ListTile(title: new Text("Test")),
-                   new Divider(),
-                   new ListTile(title: new Text("Test")),
-                   new Divider(),
-                   new ListTile(title: new Text("Test")),
-                   new Divider(),
-                   new ListTile(title: new Text("Test"))];
-
-List<Widget> currentList = [];
-String currentTitle = "";
-
-final List<Widget> drawerContent = [
-  new Container(child: new Column(
-    children: <Widget>[
-      new ListTile(
-        title: new Text("Armor"),
-        onTap: () {
-//          setState(() {
-//            currentTitle = "Armor";
-//            currentList = armorList;
-//          });
-        },
-      ),
-      new ListTile(
-        title: new Text("Weapons"),
-        onTap: () {},
-      ),
-      new ListTile (
-        title: new Text("Items"),
-        onTap: () {},
-      ),
-      new Divider(),
-      new ListTile (
-        title: new Text("About"),
-        onTap: () {},
-      )
-    ],
-  ),)
-];
-
-class CompendiumApp extends StatefulWidget {
-
+class HomePage extends StatefulWidget {
   @override
-  _HomePageState createState() => new _HomePageState();
+  State<StatefulWidget> createState() => new EquipmentState();
 }
-
-class _HomePageState extends State<CompendiumApp> {
-
+class MyApp extends StatelessWidget {
+  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-        title: currentTitle,
-        home: Scaffold(
-            appBar: new AppBar(
-              title: new Text(currentTitle),
-            ),
-            drawer: new Drawer(
-              child: new ListView(
-                children: drawerContent,
-              ),
-            ),
-            body: new ListView(
-              children: currentList,
-            )
-        )
+      title: '5e Compendium',
+      theme: new ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: new HomePage(),
     );
   }
 }
 
-void main() {
-  currentTitle = "5e compendium";
-  currentList = homeList;
-  runApp(new CompendiumApp());
+class EquipmentSheet extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    return new BottomSheet(
+      //TODO: build bottom sheet
+      builder: null,
+      onClosing: null,
+    );
+  }
 }
+
+class EquipmentState extends State<HomePage> {
+  final String url = "http://dnd5eapi.co/api/equipment/";
+  List data;
+
+  Future<String> getEquipmentData() async {
+    var res = await http.get(
+        Uri.encodeFull(url), headers: {"Accept": "application/json"});
+    setState(() {
+      var resBody = json.decode(res.body);
+      data = resBody['results'];
+    });
+
+    return "Success!";
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Equipment"),
+      ),
+        body: Container(
+        child: new ListView.builder(
+          itemCount: data == null ? 0 : data.length,
+          itemBuilder: (BuildContext context, int index) {
+            return new Container(
+              child: Center(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    ListTile(
+                      title: Text(data[index]["name"], style: TextStyle(
+                        fontSize: 18.0,
+                        color: Colors.black,
+                      ),),
+                      onTap: (){},
+                    ),
+                    Divider(),
+                  ],
+                ),
+              ),
+            );
+          },
+        )
+    ));
+  }
+
+  @override void initState() {
+    // TODO: implement initState
+    super.initState();
+    this.getEquipmentData();
+  }
+}
+
+
+void main() => runApp(new MyApp());
